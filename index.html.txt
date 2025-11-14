@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>環境知識小測驗</title>
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", "Microsoft JhengHei", sans-serif;
+      color-scheme: light;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .app {
+      width: 100%;
+      max-width: 520px;
+      margin: 16px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      padding: 20px 18px 24px;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0 0 4px;
+      text-align: center;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-bottom: 16px;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 8px 0 12px;
+    }
+    .level-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    button {
+      font-family: inherit;
+      border-radius: 999px;
+      border: none;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.05s ease-out, box-shadow 0.05s ease-out,
+        background 0.15s ease-out;
+    }
+    button:active {
+      transform: translateY(1px);
+      box-shadow: none;
+    }
+    .btn-level {
+      background: #e5f3ff;
+      color: #1d4ed8;
+      box-shadow: 0 2px 4px rgba(37,99,235,0.18);
+      width: 100%;
+    }
+    .btn-level:hover {
+      background: #dbeafe;
+    }
+    .btn-main {
+      background: #16a34a;
+      color: #ffffff;
+      box-shadow: 0 3px 7px rgba(22,163,74,0.3);
+      width: 100%;
+      margin-top: 8px;
+    }
+    .btn-main:hover {
+      background: #15803d;
+    }
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+      width: 100%;
+      margin-top: 6px;
+    }
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: #eff6ff;
+      color: #1d4ed8;
+      margin-bottom: 8px;
+    }
+    .badge span {
+      margin-left: 4px;
+      font-weight: 600;
+    }
+    .question-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-bottom: 4px;
+    }
+    .progress-bar-wrap {
+      width: 100%;
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #22c55e, #16a34a);
+      transition: width 0.25s ease-out;
+    }
+    .question-box {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      font-size: 0.98rem;
+      line-height: 1.55;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+      margin-bottom: 8px;
+    }
+    .option-btn {
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      padding: 9px 11px;
+      text-align: left;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .option-prefix {
+      font-weight: 600;
+      min-width: 18px;
+    }
+    .option-btn.correct {
+      background: #dcfce7;
+      border-color: #16a34a;
+    }
+    .option-btn.wrong {
+      background: #fee2e2;
+      border-color: #dc2626;
+    }
+    .option-btn.disabled {
+      opacity: 0.75;
+      pointer-events: none;
+    }
+    .feedback {
+      font-size: 0.9rem;
+      margin-top: 4px;
+      margin-bottom: 4px;
+      min-height: 22px;
+    }
+    .feedback.correct {
+      color: #15803d;
+    }
+    .feedback.wrong {
+      color: #b91c1c;
+    }
+    .explanation-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 4px;
+      margin-bottom: 2px;
+      color: #4b5563;
+    }
+    .explanation-text {
+      font-size: 0.85rem;
+      color: #4b5563;
+      background: #f3f4f6;
+      border-radius: 8px;
+      padding: 6px 8px;
+      white-space: pre-wrap;
+    }
+    .result-box {
+      text-align: center;
+      margin-top: 8px;
+    }
+    .result-score {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin: 4px 0;
+    }
+    .result-detail {
+      font-size: 0.9rem;
+      color: #4b5563;
+      margin-bottom: 10px;
+    }
+    .small-note {
+      font-size: 0.78rem;
+      color: #9ca3af;
+      text-align: center;
+      margin-top: 4px;
+    }
+    @media (min-width: 600px) {
+      .app {
+        margin-top: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>環境知識小測驗</h1>
+    <div class="subtitle">選擇級別，每次隨機出 20 題，一題一頁立即看解析</div>
+
+    <!-- 起始畫面：選級別 -->
+    <section id="start-screen">
+      <div class="section-title">請選擇練習級別</div>
+      <div class="level-grid">
+        <button class="btn-level" data-level="初級">初級</button>
+        <button class="btn-level" data-level="中級">中級</button>
+        <button class="btn-level" data-level="中高級">中高級</button>
+        <button class="btn-level" data-level="高級">高級</button>
+      </div>
+      <p class="small-note">題目來源：環境知識競賽題庫（每次作答隨機抽題）</p>
+    </section>
+
+    <!-- 作答畫面 -->
+    <section id="quiz-screen" class="hidden">
+      <div class="badge">
+        級別：<span id="badge-level"></span>
+      </div>
+      <div class="question-meta">
+        <span id="question-counter"></span>
+        <span id="score-brief"></span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+
+      <div class="question-box" id="question-text"></div>
+
+      <div class="options" id="options-container">
+        <!-- 選項按鈕會由 JavaScript 動態產生 -->
+      </div>
+
+      <div id="feedback" class="feedback"></div>
+      <div id="explanation-wrap" class="hidden">
+        <div class="explanation-title">解析</div>
+        <div class="explanation-text" id="explanation-text"></div>
+      </div>
+
+      <button id="next-btn" class="btn-main" disabled>下一題</button>
+      <button id="back-btn" class="btn-secondary">返回重新選擇級別</button>
+    </section>
+
+    <!-- 結果畫面 -->
+    <section id="result-screen" class="hidden">
+      <div class="badge">
+        本輪級別：<span id="result-level"></span>
+      </div>
+      <div class="result-box">
+        <p>本次完成 20 題</p>
+        <div class="result-score" id="result-score"></div>
+        <div class="result-detail" id="result-detail"></div>
+      </div>
+      <button id="retry-same-level" class="btn-main">再做一輪同級別</button>
+      <button id="retry-select-level" class="btn-secondary">回到級別選單</button>
+      <p class="small-note">提示：再次作答會重新隨機抽題</p>
+    </section>
+  </div>
+
+  <script>
+    // ===== 全域狀態 =====
+    let allQuestions = [];        // 題庫全部題目
+    let currentLevel = null;      // 目前選擇的級別
+    let currentQuestions = [];    // 這一輪要作答的 20 題
+    let currentIndex = 0;         // 目前在第幾題（0-based）
+    let correctCount = 0;         // 答對題數
+    let hasAnswered = false;      // 目前題目是否已作答
+
+    // DOM 取得
+    const startScreen = document.getElementById("start-screen");
+    const quizScreen = document.getElementById("quiz-screen");
+    const resultScreen = document.getElementById("result-screen");
+
+    const levelButtons = document.querySelectorAll(".btn-level");
+    const badgeLevel = document.getElementById("badge-level");
+    const questionCounter = document.getElementById("question-counter");
+    const scoreBrief = document.getElementById("score-brief");
+    const progressBar = document.getElementById("progress-bar");
+    const questionText = document.getElementById("question-text");
+    const optionsContainer = document.getElementById("options-container");
+    const feedbackEl = document.getElementById("feedback");
+    const explanationWrap = document.getElementById("explanation-wrap");
+    const explanationText = document.getElementById("explanation-text");
+    const nextBtn = document.getElementById("next-btn");
+    const backBtn = document.getElementById("back-btn");
+
+    const resultLevel = document.getElementById("result-level");
+    const resultScore = document.getElementById("result-score");
+    const resultDetail = document.getElementById("result-detail");
+    const retrySameLevelBtn = document.getElementById("retry-same-level");
+    const retrySelectLevelBtn = document.getElementById("retry-select-level");
+
+    // ===== 讀取 CSV 題庫 =====
+    async function loadQuestions() {
+      try {
+        const res = await fetch("questions.csv?_=" + Date.now());
+        if (!res.ok) {
+          throw new Error("無法載入題庫，請確認 questions.csv 是否與 index.html 在同一資料夾。");
+        }
+        const text = await res.text();
+        allQuestions = parseCSVToQuestions(text);
+      } catch (err) {
+        alert("載入題庫時發生錯誤：\n" + err.message);
+      }
+    }
+
+    // 簡易 CSV 解析：支援含引號的欄位
+    function parseCSVToQuestions(csvText) {
+      const lines = csvText.trim().split(/\r?\n/);
+      if (lines.length <= 1) return [];
+
+      const headerLine = lines[0];
+      const headers = splitCSVLine(headerLine);
+
+      const idxLevel = headers.indexOf("級別");
+      const idxQuestion = headers.indexOf("題目");
+      const idxOpt1 = headers.indexOf("選項1");
+      const idxOpt2 = headers.indexOf("選項2");
+      const idxOpt3 = headers.indexOf("選項3");
+      const idxOpt4 = headers.indexOf("選項4");
+      const idxAnswer = headers.indexOf("答案");
+      const idxExplain = headers.indexOf("解析");
+
+      const result = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const cells = splitCSVLine(line);
+        const level = (cells[idxLevel] || "").trim();
+        const question = (cells[idxQuestion] || "").trim();
+        const opt1 = (cells[idxOpt1] || "").trim();
+        const opt2 = (cells[idxOpt2] || "").trim();
+        const opt3 = (cells[idxOpt3] || "").trim();
+        const opt4 = (cells[idxOpt4] || "").trim();
+        const answerRaw = (cells[idxAnswer] || "").trim();
+        const explanation = (cells[idxExplain] || "").trim();
+
+        if (!question) continue; // 跳過空列
+
+        // 你的答案是數字格式：1 / 2 / 3 / 4
+        const ansNum = parseInt(answerRaw, 10);
+        const ansIndex = isNaN(ansNum) ? 0 : Math.max(0, Math.min(3, ansNum - 1));
+
+        result.push({
+          level,
+          question,
+          options: [opt1, opt2, opt3, opt4],
+          answerIndex: ansIndex,
+          explanation
+        });
+      }
+
+      return result;
+    }
+
+    // 將一行 CSV 字串拆成陣列（考慮引號）
+    function splitCSVLine(line) {
+      const result = [];
+      let current = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          // 連續兩個 " 視為一個 "
+          if (inQuotes && line[i + 1] === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === "," && !inQuotes) {
+          result.push(current);
+          current = "";
+        } else {
+          current += char;
+        }
+      }
+      result.push(current);
+      return result;
+    }
+
+    // ===== 題庫邏輯 =====
+
+    function startQuiz(level) {
+      currentLevel = level;
+      const levelQuestions = allQuestions.filter(q => q.level === level);
+      if (levelQuestions.length === 0) {
+        alert("目前題庫中沒有「" + level + "」級別的題目。");
+        return;
+      }
+
+      const count = Math.min(20, levelQuestions.length);
+      currentQuestions = pickRandomSubset(levelQuestions, count);
+      currentIndex = 0;
+      correctCount = 0;
+
+      badgeLevel.textContent = level;
+      updateScoreBrief();
+
+      startScreen.classList.add("hidden");
+      resultScreen.classList.add("hidden");
+      quizScreen.classList.remove("hidden");
+
+      showCurrentQuestion();
+    }
+
+    function pickRandomSubset(arr, count) {
+      const copy = arr.slice();
+      // Fisher–Yates 洗牌
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy.slice(0, count);
+    }
+
+    function showCurrentQuestion() {
+      hasAnswered = false;
+      nextBtn.disabled = true;
+      feedbackEl.textContent = "";
+      feedbackEl.className = "feedback";
+      explanationWrap.classList.add("hidden");
+      explanationText.textContent = "";
+
+      const total = currentQuestions.length;
+      const q = currentQuestions[currentIndex];
+
+      questionCounter.textContent = `第 ${currentIndex + 1} 題 / 共 ${total} 題`;
+      updateProgress();
+      updateScoreBrief();
+
+      questionText.textContent = q.question;
+
+      // 建立選項按鈕
+      optionsContainer.innerHTML = "";
+      const labels = ["A", "B", "C", "D"];
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.dataset.index = idx;
+
+        const prefixSpan = document.createElement("span");
+        prefixSpan.className = "option-prefix";
+        prefixSpan.textContent = labels[idx];
+
+        const textSpan = document.createElement("span");
+        textSpan.textContent = opt || "";
+
+        btn.appendChild(prefixSpan);
+        btn.appendChild(textSpan);
+        btn.addEventListener("click", () => handleAnswer(idx));
+        optionsContainer.appendChild(btn);
+      });
+
+      // 更新下一題按鈕文字
+      if (currentIndex === total - 1) {
+        nextBtn.textContent = "看結果";
+      } else {
+        nextBtn.textContent = "下一題";
+      }
+    }
+
+    function handleAnswer(selectedIndex) {
+      if (hasAnswered) return;
+      hasAnswered = true;
+
+      const q = currentQuestions[currentIndex];
+      const correctIndex = q.answerIndex;
+
+      const optionButtons = optionsContainer.querySelectorAll(".option-btn");
+      optionButtons.forEach((btn) => {
+        btn.classList.add("disabled");
+      });
+
+      const selectedBtn = optionsContainer.querySelector(
+        `.option-btn[data-index="${selectedIndex}"]`
+      );
+      const correctBtn = optionsContainer.querySelector(
+        `.option-btn[data-index="${correctIndex}"]`
+      );
+
+      if (selectedIndex === correctIndex) {
+        correctCount++;
+        if (selectedBtn) selectedBtn.classList.add("correct");
+        feedbackEl.textContent = "答對了！👍";
+        feedbackEl.classList.add("correct");
+      } else {
+        if (selectedBtn) selectedBtn.classList.add("wrong");
+        if (correctBtn) correctBtn.classList.add("correct");
+        feedbackEl.textContent = "答錯了，下次可以再注意。";
+        feedbackEl.classList.add("wrong");
+      }
+
+      // 顯示解析
+      if (q.explanation) {
+        explanationWrap.classList.remove("hidden");
+        explanationText.textContent = q.explanation;
+      }
+
+      updateScoreBrief();
+      nextBtn.disabled = false;
+    }
+
+    function updateProgress() {
+      const total = currentQuestions.length || 1;
+      const progress = (currentIndex / total) * 100;
+      progressBar.style.width = progress + "%";
+    }
+
+    function updateScoreBrief() {
+      const totalAnswered = currentIndex;
+      if (totalAnswered === 0) {
+        scoreBrief.textContent = "尚未答題";
+      } else {
+        const rate = Math.round((correctCount / totalAnswered) * 100);
+        scoreBrief.textContent = `目前答對 ${correctCount} 題（${rate}%）`;
+      }
+    }
+
+    function goNext() {
+      if (!hasAnswered) return;
+      if (currentIndex >= currentQuestions.length - 1) {
+        showResult();
+      } else {
+        currentIndex++;
+        showCurrentQuestion();
+      }
+    }
+
+    function showResult() {
+      quizScreen.classList.add("hidden");
+      resultScreen.classList.remove("hidden");
+
+      resultLevel.textContent = currentLevel;
+
+      const total = currentQuestions.length;
+      const rate = Math.round((correctCount / total) * 100);
+
+      resultScore.textContent = `${correctCount} / ${total} 題`;
+      resultDetail.textContent = `答對率：${rate}%`;
+    }
+
+    function backToStart() {
+      quizScreen.classList.add("hidden");
+      resultScreen.classList.add("hidden");
+      startScreen.classList.remove("hidden");
+    }
+
+    // ===== 事件綁定 =====
+    levelButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const level = btn.dataset.level;
+        startQuiz(level);
+      });
+    });
+
+    nextBtn.addEventListener("click", goNext);
+    backBtn.addEventListener("click", backToStart);
+    retrySameLevelBtn.addEventListener("click", () => {
+      if (currentLevel) {
+        startQuiz(currentLevel);
+      } else {
+        backToStart();
+      }
+    });
+    retrySelectLevelBtn.addEventListener("click", backToStart);
+
+    // 載入頁面就先把題庫讀進來
+    loadQuestions();
+  </script>
+</body>
+</html>
